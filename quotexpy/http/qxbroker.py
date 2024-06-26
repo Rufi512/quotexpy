@@ -20,7 +20,11 @@ class Browser(object):
 
     def get_cookies_and_ssid(self) -> Tuple[Any, str]:
         try:
-            browser = uc.Chrome(headless=self.headless, use_subprocess=False)
+            chrome_options = uc.ChromeOptions()
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument('--window-size=1920,1080')
+            chrome_options.add_argument('--disable-gpu')
+            browser = uc.Chrome(headless=self.headless, use_subprocess=False, options=chrome_options)
         except TypeError as exc:
             raise SystemError("Chrome is not installed, did you forget?") from exc
         browser.get(f"{self.https_base_url}/en/sign-in")
