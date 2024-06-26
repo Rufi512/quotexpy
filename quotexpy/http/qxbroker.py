@@ -39,6 +39,7 @@ class Browser(object):
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
         except Exception as exc:
+            browser.quit()
             raise QuotexAuthError("incorrect username or password") from exc
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
 
