@@ -29,10 +29,14 @@ class Browser(object):
             chrome_options.add_argument("--disable-setuid-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
             browser = uc.Chrome(headless=self.headless, use_subprocess=False, options=chrome_options)
-            browser.delete_all_cookies()
-            time.sleep(2)
         except TypeError as exc:
             raise SystemError("Chrome is not installed, did you forget?") from exc
+        browser.delete_all_cookies()
+        browser.get("chrome://settings/clearBrowserData")
+        time.sleep(5)
+        javaScript = "document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm').click()"
+        browser.execute_script(javaScript)
+        time.sleep(5)
         browser.get(f"{self.https_base_url}/en/sign-in")
         if browser.current_url != f"{self.https_base_url}/en/trade":
             browser.execute_script('document.getElementsByName("email")[1].value = arguments[0];', self.email)
