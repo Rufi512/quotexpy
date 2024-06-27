@@ -30,6 +30,7 @@ class Browser(object):
             chrome_options.add_argument("--disable-dev-shm-usage")
             browser = uc.Chrome(headless=self.headless, use_subprocess=False, options=chrome_options)
         except TypeError as exc:
+            browser.quit()
             raise SystemError("Chrome is not installed, did you forget?") from exc
         browser.get(f"{self.https_base_url}/en/sign-in")
         if browser.current_url != f"{self.https_base_url}/en/trade":
