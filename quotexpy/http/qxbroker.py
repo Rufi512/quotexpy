@@ -30,13 +30,10 @@ class Browser(object):
             chrome_options.add_argument("--disable-dev-shm-usage")
             browser = uc.Chrome(headless=self.headless, use_subprocess=False, options=chrome_options)
             browser.delete_all_cookies()
-           
+            time.sleep(2)
         except TypeError as exc:
             raise SystemError("Chrome is not installed, did you forget?") from exc
         browser.get(f"{self.https_base_url}/en/sign-in")
-        time.sleep(2)
-        browser.delete_all_cookies()
-        time.sleep(2)
         if browser.current_url != f"{self.https_base_url}/en/trade":
             browser.execute_script('document.getElementsByName("email")[1].value = arguments[0];', self.email)
             browser.execute_script('document.getElementsByName("password")[1].value = arguments[0];', self.password)
@@ -63,7 +60,6 @@ class Browser(object):
         cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
         cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
         output_file.write_text(json.dumps({"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}, indent=4))
-        browser.delete_all_cookies()
         browser.quit()
 
         return ssid, cookie_string
