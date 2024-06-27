@@ -22,6 +22,7 @@ class Browser(object):
         try:
             chrome_options = uc.ChromeOptions()
             chrome_options.add_argument("--disable-extensions")
+            chrome_options.add_argument('--incognito')
             chrome_options.add_argument('--disable-application-cache')
             chrome_options.add_argument('--disable-gpu')
             chrome_options.add_argument("--no-sandbox")
