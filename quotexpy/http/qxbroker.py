@@ -29,6 +29,8 @@ class Browser(object):
             chrome_options.add_argument("--disable-setuid-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
             browser = uc.Chrome(headless=self.headless, use_subprocess=False, options=chrome_options)
+            browser.delete_all_cookies()
+            time.sleep(2)
         except TypeError as exc:
             browser.quit()
             raise SystemError("Chrome is not installed, did you forget?") from exc
