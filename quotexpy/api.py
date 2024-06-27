@@ -240,11 +240,19 @@ class QuotexAPI(object):
         Send ssid to Quotex
             max_attemps - time to wait for authorization in seconds
         """
+        data = {}
         self.profile.msg = None
+        if os.path.isfile(".session.json"):
+            with open(".session.json") as file:
+                data = json.loads(file.read())
+        #return data.get("ssid"), data.get("cookies")
         if not global_value.SSID:
             if os.path.exists(os.path.join(".session.json")):
                 os.remove(".session.json")
             return False
+        ssid_data = data.get("ssid") if data.get("ssid") else global_value.SSID
+        self.logger.info(f"SSID received: {ssid_data} ")
+        global_value.SSID = ssid_data
         self.ssid(global_value.SSID)
         start_time = time.time()
         previous_second = -1
