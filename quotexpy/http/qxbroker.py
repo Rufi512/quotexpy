@@ -21,9 +21,12 @@ class Browser(object):
     def get_cookies_and_ssid(self) -> Tuple[Any, str]:
         try:
             chrome_options = uc.ChromeOptions()
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--window-size=1920,1080')
+            chrome_options.add_argument("--disable-extensions")
+            chrome_options.add_argument('--disable-application-cache')
             chrome_options.add_argument('--disable-gpu')
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-setuid-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
             browser = uc.Chrome(headless=self.headless, use_subprocess=False, options=chrome_options)
         except TypeError as exc:
             raise SystemError("Chrome is not installed, did you forget?") from exc
