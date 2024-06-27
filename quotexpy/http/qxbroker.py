@@ -32,19 +32,17 @@ class Browser(object):
         except TypeError as exc:
             raise SystemError("Chrome is not installed, did you forget?") from exc
         browser.delete_all_cookies()
-        browser.get("chrome://settings/clearBrowserData")
-        time.sleep(5)
-        javaScript = "document.querySelector('settings-ui').shadowRoot.querySelector('settings-main').shadowRoot.querySelector('settings-basic-page').shadowRoot.querySelector('settings-section > settings-privacy-page').shadowRoot.querySelector('settings-clear-browsing-data-dialog').shadowRoot.querySelector('#clearBrowsingDataDialog').querySelector('#clearBrowsingDataConfirm').click()"
-        browser.execute_script(javaScript)
         time.sleep(5)
         browser.get(f"{self.https_base_url}/en/sign-in")
         if browser.current_url != f"{self.https_base_url}/en/trade":
+            print("Pass to try login")
             browser.execute_script('document.getElementsByName("email")[1].value = arguments[0];', self.email)
             browser.execute_script('document.getElementsByName("password")[1].value = arguments[0];', self.password)
             browser.execute_script(
                 """document.evaluate("//div[@id='tab-1']/form", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.submit();"""
             )
             time.sleep(5)
+        print("Pass cookies")
         cookies = browser.get_cookies()
         self.api.cookies = cookies
         soup = BeautifulSoup(browser.page_source, "html.parser")
