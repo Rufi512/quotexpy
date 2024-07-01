@@ -43,11 +43,15 @@ class Browser(object):
             )
             time.sleep(5)
         print("Pass cookies")
-        cookies = browser.get_cookies()
-        self.api.cookies = cookies
-        soup = BeautifulSoup(browser.page_source, "html.parser")
-        user_agent = browser.execute_script("return navigator.userAgent;")
-        self.api.user_agent = user_agent
+        try:
+            cookies = browser.get_cookies()
+            self.api.cookies = cookies
+            soup = BeautifulSoup(browser.page_source, "html.parser")
+            user_agent = browser.execute_script("return navigator.userAgent;")
+            self.api.user_agent = user_agent
+        except Exception as exc:
+            browser.quit()
+            raise QuotexAuthError("Cannot get cookies") from exc
         try:
             script = soup.find_all("script", {"type": "text/javascript"})[1].get_text()
         except Exception as exc:
@@ -55,13 +59,16 @@ class Browser(object):
             browser.quit()
             raise QuotexAuthError("incorrect username or password") from exc
         match = re.sub("window.settings = ", "", script.strip().replace(";", ""))
-
-        ssid = json.loads(match).get("token")
-        output_file = Path(".session.json")
-        output_file.parent.mkdir(exist_ok=True, parents=True)
-        cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
-        cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
-        output_file.write_text(json.dumps({"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}, indent=4))
-        browser.quit()
+        try:
+            ssid = json.loads(match).get("token")
+            output_file = Path(".session.json")
+            output_file.parent.mkdir(exist_ok=True, parents=True)
+            cookiejar = requests.utils.cookiejar_from_dict({c["name"]: c["value"] for c in cookies})
+            cookie_string = "; ".join([f"{c.name}={c.value}" for c in cookiejar])
+            output_file.write_text(json.dumps({"cookies": cookie_string, "ssid": ssid, "user_agent": user_agent}, indent=4))
+            browser.quit()
+        except Exception as exc:
+            browser.quit()
+            raise QuotexAuthError("Cannot get ssid") from exc
 
         return ssid, cookie_string
